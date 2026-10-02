@@ -57,4 +57,3 @@ Le programme génère un fichier `reconstruction.dat` (ou similaire) contenant l
 * **[Nom / Prénom Étudiant 3]** - *[Rôle/Tâches, ex: Orientation & Parcours BFS]*
 * **[Nom / Prénom Étudiant 4]** - *[Rôle/Tâches, ex: Étalement gaussien & Visualisation]*
 
-
