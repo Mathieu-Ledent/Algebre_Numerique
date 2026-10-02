@@ -52,7 +52,7 @@ Le programme génère un fichier `reconstruction.dat` (ou similaire) contenant l
 
 ## 👥 Équipe (Groupe de 4)
 
-* **[Nom / Prénom Étudiant 1]** - *[Rôle/Tâches, ex: Solveur Cholesky]*
+* **[Asscherickx / Diego Étudiant 1]** - *[Rôle/Tâches, ex: Solveur Cholesky]*
 * **[Nom / Prénom Étudiant 2]** - *[Rôle/Tâches, ex: Recherche spatiale & Normales]*
 * **[Nom / Prénom Étudiant 3]** - *[Rôle/Tâches, ex: Orientation & Parcours BFS]*
 * **[Nom / Prénom Étudiant 4]** - *[Rôle/Tâches, ex: Étalement gaussien & Visualisation]*
