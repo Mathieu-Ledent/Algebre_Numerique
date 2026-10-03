@@ -6,7 +6,7 @@
 
 Ce projet implémente une chaîne complète de reconstruction de surface (courbe 2D) à partir d'un nuage de points potentiellement bruité. La méthode repose sur la **reconstruction de Poisson**, combinée à un solveur de système linéaire utilisant une **factorisation de Cholesky creuse**.
 
-## 🎯 Objectifs du projet
+##   Objectifs du projet
 
 L'objectif est d'estimer une fonction implicite $f(x,y)$ sur une grille cartésienne régulière dont une ligne de niveau $\Gamma$ correspond à la courbe à reconstruire. Le projet est divisé en plusieurs modules qui s'enchaînent :
 
@@ -23,15 +23,15 @@ L'objectif est d'estimer une fonction implicite $f(x,y)$ sur une grille cartési
    - Résolution par substitutions avant et arrière.
 7. **Extraction de la courbe :** Calcul du niveau optimal $\tau$ et interpolation pour tracer la ligne de niveau finale.
 
-## 🛠️ Dépendances
+##   Dépendances
 
 Le code est écrit en **C**. Il requiert les bibliothèques externes suivantes :
 * **FLANN** (Fast Library for Approximate Nearest Neighbors) : pour la recherche spatiale rapide des voisins.
 * **METIS** *(Optionnel)* : pour calculer la permutation des nœuds visant à minimiser le remplissage lors de la factorisation.
 
-## 🚀 Compilation et Exécution
+##   Compilation et Exécution
 
-*(À compléter avec votre Makefile ou vos commandes de compilation)*
+*(À compléter avec notre Makefile ou nos commandes de compilation)*
 
 ### Exemple d'exécution
 
@@ -51,10 +51,10 @@ Le programme principal prend en entrée un fichier texte contenant le nuage de p
 
 Le programme génère un fichier `reconstruction.dat` (ou similaire) contenant la géométrie de la grille et les valeurs du champ scalaire $f$, prêt à être lu par un script Python ou un outil de tracé pour visualiser le résultat.
 
-## 👥 Équipe (Groupe de 4)
+##   Équipe (Groupe de 4)
 
 * **[Asscherickx / Diego]** - *[Résoluton par Cholesky creux et visualisation]*
-* **[Nom / Prénom Étudiant 2]** - *[Rôle/Tâches, ex: Recherche spatiale & Normales]*
+* **[Ledent /Mathieu]** - *[Orientation et parcours BFS + Schema de poisson]*
 * **[Nom / Prénom Étudiant 3]** - *[Rôle/Tâches, ex: Orientation & Parcours BFS]*
 * **[Nom / Prénom Étudiant 4]** - *[Rôle/Tâches, ex: Étalement gaussien & Visualisation]*
 
