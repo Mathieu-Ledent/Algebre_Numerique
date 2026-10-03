@@ -2,7 +2,7 @@
 
 **Année académique :** 2026-2027  
 **Cours :** LINMA1170 - Analyse numérique  
-
+**Lien Overleaf :** https://overleaf.info.ucl.ac.be/2827439654ncfbrjqmpywj#be3b48
 Ce projet implémente une chaîne complète de reconstruction de surface (courbe 2D) à partir d'un nuage de points potentiellement bruité. La méthode repose sur la **reconstruction de Poisson**, combinée à un solveur de système linéaire utilisant une **factorisation de Cholesky creuse**.
 
 ## 🎯 Objectifs du projet
