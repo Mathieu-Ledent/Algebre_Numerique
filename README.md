@@ -55,6 +55,6 @@ Le programme génère un fichier `reconstruction.dat` (ou similaire) contenant l
 
 * **[Asscherickx / Diego]** - *[Résoluton par Cholesky creux et visualisation]*
 * **[Ledent /Mathieu]** - *[Orientation et parcours BFS + Schema de poisson]*
-* **[Nom / Prénom Étudiant 3]** - *[Rôle/Tâches, ex: Orientation & Parcours BFS]*
+* **[Vos de Wael / Thibault]** - *[Recherche spatiale et estimation des normales]*
 * **[Nom / Prénom Étudiant 4]** - *[Rôle/Tâches, ex: Étalement gaussien & Visualisation]*
 
