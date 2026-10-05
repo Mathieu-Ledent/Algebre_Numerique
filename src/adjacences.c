@@ -43,7 +43,7 @@ void calculerAdjacences(const double points[][2], Adjacences *adj){
     for(int i=0; i<N; i++){
         double *query = dataset + 2 * i;  // -> c'est le point i auquel on va chercher ses voisins
 
-        int status = flann_find_nearest_neighbors_index_double(index, query, 1, indicesResultats, distances, nbResultats, &params);  //status fait quoi?
+        int status = flann_find_nearest_neighbors_index_double(index, query, 1, indicesResultats, distances, nbResultats, &params);
 
         if(status != 0){
             fprintf(stderr, "Erreur FLANN pour le point %d.\n", i);
