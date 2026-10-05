@@ -10,12 +10,12 @@ void calculerAdjacences(const double points[][2], Adjacences *adj){
     int N = adj->N;
 
 
-    //adj->k = nombre de voisins que l'on veut
+    //adj->k = nombre de voisins que l'on veut par point p_i
     int k = adj->k;
 
     int nbResultats = k +1;
 
-    struct FLANNParameters params = DEFAULT_FLANN_PARAMETERS;  //les réglages pour FLANN
+    struct FLANNParameters params = DEFAULT_FLANN_PARAMETERS;  //réglages pour FLANN 
 
     //On utilise le kd-tree :
     params.algorithm = FLANN_INDEX_KDTREE;   
