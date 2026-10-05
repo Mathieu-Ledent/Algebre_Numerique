@@ -18,8 +18,9 @@ void calculerAdjacences(const double points[][2], Adjacences *adj){
     struct FLANNParameters params = DEFAULT_FLANN_PARAMETERS;  //les réglages pour FLANN
 
     //On utilise le kd-tree :
-    params.algorithm = FLANN_INDEX_KDTREE;
+    params.algorithm = FLANN_INDEX_KDTREE;   
     params.trees = 4;
+    params.checks = FLANN_CHECKS_UNLIMITED;   //Correspond à une recherche lente mais très précise
 
     double *dataset = (double *)points;  //La raison de la conversion est car FLANN demande un double et on lui donne un const double
 
@@ -40,16 +41,16 @@ void calculerAdjacences(const double points[][2], Adjacences *adj){
     }
 
     for(int i=0; i<N; i++){
-        double *query = dataset + 2 * i;  //c est le point i où l'on va chercher ses voisins
+        double *query = dataset + 2 * i;  // -> c'est le point i auquel on va chercher ses voisins
 
-        int status = flann_find_nearest_neighbors_index_double(index, query, 1, indicesResultats, distances, nbResultats, &params);
+        int status = flann_find_nearest_neighbors_index_double(index, query, 1, indicesResultats, distances, nbResultats, &params);  //status fait quoi?
 
         if(status != 0){
             fprintf(stderr, "Erreur FLANN pour le point %d.\n", i);
             continue;
         }
 
-        int compteur = 0;
+        int compteur = 0;       // On s'assure que le point dont l'index est i n'est pas pris en compte
 
         for(int j =0; j<nbResultats && compteur<k; j++){
             int voisin = indicesResultats[j];
