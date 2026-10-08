@@ -1,8 +1,13 @@
-#include "adjacences.h"
 #include <stdlib.h>
 #include <stdio.h>
 
 #include <flann/flann.h>
+
+typedef struct{
+    int N;
+    int k;
+    int *voisins;
+} Adjacences;
 
 
 void calculerAdjacences(const double points[][2], Adjacences *adj){
