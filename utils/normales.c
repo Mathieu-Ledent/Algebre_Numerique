@@ -1,11 +1,82 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include "adjacences.h"
 #include "utils.h"
 
 void CalculerDroitesMoyennes(const double points[][2], const Adjacences *adj,double barycentres[][2], double normales[][2]){
+    int N = adj->N;
+    int k = adj->k;
 
+    for(int i=0; i<N; i++){
+        double sommeX = points[i][0];
+        double sommeY = points[i][1];
+
+        for(int j=0; j<k; j++){
+            int voisin = adj->voisins[i*k+j];
+
+            sommeX += points[voisin][0];
+            sommeY += points[voisin][1];
+        }
+
+        barycentres[i][0] = sommeX / (k+1);  //xi barre
+        barycentres[i][1] = sommeY / (k+1);   //yi barre
+
+        double Cxx = 0.0;
+        double Cxy = 0.0;
+        double Cyy = 0.0;
+
+        double dx = points[i][0] - barycentres[i][0];
+        double dy = points[i][1] - barycentres[i][1];
+
+        Cxx += dx*dx;
+        Cxy += dx*dy;
+        Cyy += dy*dy;
+
+        for(int j=0; j<k; j++){
+            int voisin = adj->voisins[i*k +j];
+
+            dx = points[voisin][0] - barycentres[voisin][0];
+            dy = points[voisin][1] - barycentres[voisin][1];
+
+            Cxx += dx*dx;
+            Cxy += dx*dy;
+            Cyy += dy*dy;
+        }
+
+        Cxx /= k+1;
+        Cxy /= k+1;
+        Cyy /= k+1;
+
+        double delta = sqrt((Cxx-Cyy) * (Cxx-Cyy) + 4.0 * Cxy*Cxy);
+
+        double lambdaMin = 0.5* (Cxx+Cyy-delta);
+
+        double nx;
+        double ny;
+
+        if(fabs(Cxy) > 1e-12){
+            nx = Cxy;
+            ny = lambdaMin-Cxx;
+        }else{
+            if(Cxx <= Cyy){
+                nx = 1.0;
+                ny = 0.0;
+            }else{
+                nx = 0.0;
+                ny = 1.0;
+            }
+        }
+
+        double norme = sqrt(nx*nx + ny*ny);
+
+        nx /= norme;
+        ny /= norme;
+
+        normales[i][0] = nx;
+        normales[i][1] = ny;
+    }
    
 }
 
