@@ -1,59 +1,42 @@
-
 #include "sparse_matrix.h"
+#include <stddef.h>
 #include <stdlib.h>
 
-MatriceCSC *allocate_matrix(int n, size_t nnz)
+
+
+MatriceCSC *allocateMatriceCSC(int n, size_t nnz)
 {
-    if (n < 0) {
+    if (n <= 0) return NULL;
+
+    MatriceCSC *m = malloc(sizeof(MatriceCSC));
+    if (m == NULL) return NULL;
+
+    m->n = n;
+    m->nnz = nnz;
+
+    /* calloc(0, ...) peut renvoyer NULL : on alloue au moins 1 element. */
+    size_t taille = (nnz > 0) ? nnz : 1;
+
+    m->valeurs      = calloc(taille, sizeof(double));
+    m->lignes       = calloc(taille, sizeof(int));
+    m->debutColonne = calloc((size_t)n + 1, sizeof(size_t));
+
+    if (m->valeurs == NULL || m->lignes == NULL || m->debutColonne == NULL) {
+        free(m->valeurs);
+        free(m->lignes);
+        free(m->debutColonne);
+        free(m);
         return NULL;
     }
 
-    MatriceCSC *mat = malloc(sizeof(MatriceCSC));
-
-    if (mat == NULL) {
-        return NULL;
-    }
-
-    mat->n = n;
-    mat->nnz = nnz;
-
-    mat->valeurs = NULL;
-    mat->lignes = NULL;
-    mat->debutColonne = NULL;
-
-    if (nnz > 0) {
-        mat->valeurs = malloc(nnz * sizeof(double));
-        mat->lignes = malloc(nnz * sizeof(int));
-
-        if (mat->valeurs == NULL || mat->lignes == NULL) {
-            free(mat->valeurs);
-            free(mat->lignes);
-            free(mat);
-            return NULL;
-        }
-    }
-
-    mat->debutColonne = calloc((size_t)n + 1,
-                               sizeof(size_t));
-
-    if (mat->debutColonne == NULL) {
-        free(mat->valeurs);
-        free(mat->lignes);
-        free(mat);
-        return NULL;
-    }
-
-    return mat;
+    return m;
 }
 
-void free_matrix(MatriceCSC *mat)
+void freeMatriceCSC(MatriceCSC *m)
 {
-    if (mat == NULL) {
-        return;
-    }
-
-    free(mat->valeurs);
-    free(mat->lignes);
-    free(mat->debutColonne);
-    free(mat);
+    if (m == NULL) return;
+    free(m->valeurs);
+    free(m->lignes);
+    free(m->debutColonne);
+    free(m);
 }
