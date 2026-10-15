@@ -1,7 +1,5 @@
 #include <stdlib.h>
 #include "solver.h"
-#include "sparse_matrix.h"
-#include "poisson.h"
 
 void substitutionAvant(const MatriceCSC *L, const double b[], double y[])
 {

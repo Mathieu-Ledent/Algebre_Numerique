@@ -1,6 +1,6 @@
-#include <stddef.h>
 #include <stdlib.h>
 #include "poisson.h"
+
 
 
 /* MatriceCSC : voir message precedent. */
@@ -99,5 +99,5 @@ void construireMatricePoisson(const Grille *grille, const int numero[], MatriceC
             A->valeurs[b] = v;
         }
     }
-    free(pos);sr
+    free(pos);
 }

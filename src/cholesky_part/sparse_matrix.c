@@ -40,3 +40,51 @@ void freeMatriceCSC(MatriceCSC *m)
     free(m->debutColonne);
     free(m);
 }
+
+void libererTableauxCSC(MatriceCSC *m)
+{
+    if (m == NULL) return;
+
+    free(m->valeurs);
+    free(m->lignes);
+    free(m->debutColonne);
+
+    m->valeurs = NULL;
+    m->lignes = NULL;
+    m->debutColonne = NULL;
+
+    m->n = 0;
+    m->nnz = 0;
+}
+
+
+void produitSymetrique(const MatriceCSC *A,
+                       const double x[],
+                       double y[])
+{
+    if (A == NULL || x == NULL || y == NULL) return;
+
+    /* Initialisation du résultat */
+    for (int i = 0; i < A->n; i++) {
+        y[i] = 0.0;
+    }
+
+    /* Parcours des colonnes de la matrice */
+    for (int j = 0; j < A->n; j++) {
+        for (size_t k = A->debutColonne[j];
+             k < A->debutColonne[j + 1];
+             k++) {
+
+            int i = A->lignes[k];
+            double a = A->valeurs[k];
+
+            /* Contribution du coefficient stocké */
+            y[i] += a * x[j];
+
+            /* Contribution symétrique, sauf sur la diagonale */
+            if (i != j) {
+                y[j] += a * x[i];
+            }
+        }
+    }
+}

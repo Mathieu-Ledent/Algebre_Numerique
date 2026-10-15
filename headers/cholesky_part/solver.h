@@ -1,4 +1,7 @@
 
+#ifndef SOLVER_H
+#define SOLVER_H
+
 #include "sparse_matrix.h"
 #include "poisson.h"
 
@@ -12,3 +15,7 @@ void substitutionArriere(const MatriceCSC *L, const double y[], double F[]);
    puis replace F[numero[i]] dans grille->f (bord mis a 0).
    Renvoie 0 en cas de succes, -1 si les arguments sont invalides ou si une allocation echoue. */
 int resoudrePoisson(Grille *grille, const int numero[], const MatriceCSC *L);
+
+
+
+#endif
