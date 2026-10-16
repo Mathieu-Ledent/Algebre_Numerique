@@ -5,7 +5,7 @@
 #include "adjacences.h"
 #include "utils.h"
 
-void CalculerDroitesMoyennes(const double points[][2], const Adjacences *adj,double barycentres[][2], double normales[][2]){
+void calculerDroitesMoyennes(const double points[][2], const Adjacences *adj,double barycentres[][2], double normales[][2]){
     int N = adj->N;
     int k = adj->k;
 
@@ -37,17 +37,17 @@ void CalculerDroitesMoyennes(const double points[][2], const Adjacences *adj,dou
         for(int j=0; j<k; j++){
             int voisin = adj->voisins[i*k +j];
 
-            dx = points[voisin][0] - barycentres[voisin][0];
-            dy = points[voisin][1] - barycentres[voisin][1];
+            dx = points[voisin][0] - barycentres[i][0];
+            dy = points[voisin][1] - barycentres[i][1];
 
             Cxx += dx*dx;
             Cxy += dx*dy;
             Cyy += dy*dy;
         }
 
-        Cxx /= k+1;
-        Cxy /= k+1;
-        Cyy /= k+1;
+        Cxx /= (k+1);
+        Cxy /= (k+1);
+        Cyy /= (k+1);
 
         double delta = sqrt((Cxx-Cyy) * (Cxx-Cyy) + 4.0 * Cxy*Cxy);
 
