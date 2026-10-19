@@ -2,6 +2,12 @@
 #include <stdlib.h>
 #include "cholesky.h"
 
+/* Optimisations GCC des noyaux de calcul (ignorees par les autres compilateurs).
+   Pas de -ffast-math : on garde l'arithmetique IEEE stricte pour Cholesky. */
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC optimize("O3", "unroll-loops")
+#endif
+
 static void libererListes(int **liste, size_t *taille, int M)
 {
     if (liste != NULL)
