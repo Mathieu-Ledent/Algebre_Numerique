@@ -1,3 +1,9 @@
+#if defined(_MSC_VER)
+#define _USE_MATH_DEFINES
+#elif defined(__linux__)
+#define _GNU_SOURCE
+#endif
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,7 +17,7 @@ typedef struct {
 } Grille;
 
 double guassianSplitting(double dist2, double sigma) {
-    double coef = 1/(2*M_PI*sigma*sigma);
+    double coef = 1.0/(2.0*M_PI*sigma*sigma);
     double expo = exp((-1) * (dist2/(2*sigma*sigma)));
     return coef*expo;
 }
