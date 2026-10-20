@@ -23,8 +23,8 @@ void calculerAdjacences(const double points[][2], Adjacences *adj){
     struct FLANNParameters params = DEFAULT_FLANN_PARAMETERS;  //réglages pour FLANN 
 
     //On utilise le kd-tree :
-    params.algorithm = FLANN_INDEX_KDTREE;   
-    params.trees = 4;
+    params.algorithm = FLANN_INDEX_KDTREE_SINGLE;   
+    params.trees = 1;
     params.checks = FLANN_CHECKS_UNLIMITED;   //Correspond à une recherche lente mais très précise
 
     double *dataset = (double *)points;  //La raison de la conversion est car FLANN demande un double et on lui donne un const double
