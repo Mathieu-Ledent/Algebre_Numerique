@@ -1,6 +1,12 @@
 #include <stdlib.h>
 #include "solver.h"
 
+/* Optimisations GCC des noyaux de calcul (ignorees par les autres compilateurs).
+   Pas de -ffast-math : on garde l'arithmetique IEEE stricte pour Cholesky. */
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC optimize("O3", "unroll-loops")
+#endif
+
 void substitutionAvant(const MatriceCSC *L, const double b[], double y[])
 {
     const int M = L->n;

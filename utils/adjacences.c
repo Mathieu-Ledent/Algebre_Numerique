@@ -3,11 +3,13 @@
 
 #include <flann/flann.h>
 
-typedef struct{
-    int N;
-    int k;
-    int *voisins;
-} Adjacences;
+#include "adjacences.h"
+
+/* Optimisations GCC des noyaux de calcul (ignorees par les autres compilateurs).
+   Pas de -ffast-math : on garde l'arithmetique IEEE stricte pour Cholesky. */
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC optimize("O3", "unroll-loops")
+#endif
 
 
 void calculerAdjacences(const double points[][2], Adjacences *adj){

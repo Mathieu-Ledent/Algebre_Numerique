@@ -5,6 +5,12 @@
 #include "adjacences.h"
 #include "utils.h"
 
+/* Optimisations GCC des noyaux de calcul (ignorees par les autres compilateurs).
+   Pas de -ffast-math : on garde l'arithmetique IEEE stricte pour Cholesky. */
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC optimize("O3", "unroll-loops")
+#endif
+
 void calculerDroitesMoyennes(const double points[][2], const Adjacences *adj,double barycentres[][2], double normales[][2]){
     int N = adj->N;
     int k = adj->k;
@@ -85,14 +91,43 @@ void calculerDroitesMoyennes(const double points[][2], const Adjacences *adj,dou
 void orienterNormales(const Adjacences *adj, double normales[][2]) {
     int N = adj->N;
     int k = adj->k;
-    
+
+    // Graphe NON oriente au format CSR : i et j sont relies si j est dans N(i) OU i dans N(j).
+    // Les listes de FLANN ne sont pas reciproques, il faut donc ajouter chaque arete dans les deux sens.
+    // (Une arete declaree des deux cotes apparait deux fois : sans consequence pour le parcours.)
+    int *debut = calloc((size_t)N + 1, sizeof(int));
+    int *graphe = malloc((size_t)2 * N * k * sizeof(int));
+    int *remplis = malloc((size_t)N * sizeof(int));
+
     // Tableau pour marquer les points "découverts" (0 = non, 1 = oui)
-    int decouverts[N];
-    memset(decouverts, 0, N * sizeof(int));
-    
+    int *decouverts = calloc((size_t)N, sizeof(int));
+
     // file (FIFO) pour stocker les indices des points à traiter
-    int file[N]; 
-    
+    int *file = malloc((size_t)N * sizeof(int));
+
+    if (!debut || !graphe || !remplis || !decouverts || !file) {
+        free(debut); free(graphe); free(remplis); free(decouverts); free(file);
+        return;
+    }
+
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < k; j++) {
+            debut[i + 1]++;
+            debut[adj->voisins[i * k + j] + 1]++;
+        }
+    }
+    for (int i = 0; i < N; i++) {
+        debut[i + 1] += debut[i];
+        remplis[i] = debut[i];
+    }
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < k; j++) {
+            int v = adj->voisins[i * k + j];
+            graphe[remplis[i]++] = v;
+            graphe[remplis[v]++] = i;
+        }
+    }
+
     // On parcourt tous les points de 0 à N-1. 
     // Cela garantit que chaque composante connexe séparée sera traitée.
     for (int start_node = 0; start_node < N; start_node++) {
@@ -117,9 +152,9 @@ void orienterNormales(const Adjacences *adj, double normales[][2]) {
                 double ref_x = normales[i][0];
                 double ref_y = normales[i][1];
                 
-                // On examine tous ses k voisins
-                for (int j = 0; j < k; j++) {
-                    int indice_voisin = adj->voisins[i * k + j];
+                // On examine tous ses voisins dans le graphe non oriente
+                for (int p = debut[i]; p < debut[i + 1]; p++) {
+                    int indice_voisin = graphe[p];
                     
                     // On n'agit que si ce voisin est "non encore découvert"
                     if (decouverts[indice_voisin] == 0) {
@@ -144,4 +179,6 @@ void orienterNormales(const Adjacences *adj, double normales[][2]) {
             }
         }
     }
+
+    free(debut); free(graphe); free(remplis); free(decouverts); free(file);
 }
