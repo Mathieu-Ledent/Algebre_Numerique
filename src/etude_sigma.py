@@ -45,7 +45,7 @@ generateur = np.random.default_rng(4)
 direction_bruit = generateur.normal(size=points.shape)
 
 sigmas = [1 * h, 1.5 * h, 2 * h, 2.5 * h, 3 * h]
-bruits = [0, 0.5 * h, 2 * h]
+bruits = [ 0.5 * h, 1 * h, 2 * h]
 
 fig, axes = plt.subplots(len(bruits), len(sigmas), figsize=(10, 9))
 
