@@ -13,6 +13,7 @@ static const double PI = 3.14159265358979323846;
 
 
 double guassianSplitting(double dist2, double sigma) {
+    // Calcul de G_sigma(d)
     double coef = 1.0/(2.0*PI*sigma*sigma);
     double expo = exp((-1) * (dist2/(2*sigma*sigma)));
     return coef*expo;
@@ -24,20 +25,25 @@ void calculerDivergence(int N, const double points[][2],
     Grille *grille) 
     {
 
+    // Parcours de chaque nœud de la grille
     for (int j = 0; j < grille->ny; j++) {
         for (int i = 0; i < grille->nx; i++) {
 
             double div = 0;
 
+            // Coordonnées du nœud courant de la grille
             double qx = grille->xmin + i*grille->h;
             double qy = grille->ymin + j*grille->h;
         
+            // Parcours de tous les points du nuage
             for (int k = 0; k < N; k++) {
                 
+                // Calcul de la distance entre le nœud q et le point p_i
                 double diff_x = qx - points[k][0];
                 double diff_y = qy - points[k][1];
                 double dist2 = (diff_x*diff_x) + (diff_y*diff_y);
 
+                // Calcul de la divergence
                 double g_value = guassianSplitting(dist2, sigma);
                 double sca_product = normales[k][0] * diff_x + normales[k][1] * diff_y;
 
@@ -48,6 +54,8 @@ void calculerDivergence(int N, const double points[][2],
             }
 
             div *= (-1)/(sigma*sigma);
+
+            // Stockage indexé dans le tableau 1D de la grille
             int index = i + grille->nx*j;
             grille->g[index] = div;
 
