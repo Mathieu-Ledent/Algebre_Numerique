@@ -1,16 +1,16 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "divergence.h"
+
+/* Optimisations GCC des noyaux de calcul (ignorees par les autres compilateurs).
+   Pas de -ffast-math : on garde l'arithmetique IEEE stricte pour Cholesky. */
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC optimize("O3", "unroll-loops")
+#endif
 
 static const double PI = 3.14159265358979323846;
 
-typedef struct {
-    int nx, ny; /* Dimensions, bord compris. */
-    double xmin, ymin; /* Origine de la grille. */
-    double h; /* Pas identique en x et y. */
-    double *g; /* Divergence : nx*ny valeurs. */
-    double *f; /* Solution : nx*ny valeurs. */
-} Grille;
 
 double guassianSplitting(double dist2, double sigma) {
     double coef = 1.0/(2.0*PI*sigma*sigma);

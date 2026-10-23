@@ -1,17 +1,7 @@
-#ifndef GRILLE_H
-#define GRILLE_H
+#ifndef DIVERGENCE_H
+#define DIVERGENCE_H
 
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-typedef struct {
-    int nx, ny; /* Dimensions, bord compris. */
-    double xmin, ymin; /* Origine de la grille. */
-    double h; /* Pas identique en x et y. */
-    double *g; /* Divergence : nx*ny valeurs. */
-    double *f; /* Solution : nx*ny valeurs. */
-} Grille;
+#include "grille.h"
 
 double guassianSplitting(double dist2, double sigma);
 
