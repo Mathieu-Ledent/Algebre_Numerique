@@ -17,12 +17,11 @@ static void libererListes(int **liste, size_t *taille, int M)
 }
 
 /*
- * A : triangle inferieur en CSC, lignes triees dans chaque colonne.
- * liste[j] = voisins de j d'indice > j (voisins de A + remplissage), tries, sans doublon.
- * En cas d'echec d'allocation : L->n = 0, L->nnz = 0, tableaux NULL.
+ * A : matrice stockée en CSC, L contient les positions à remplir dans le triangle inférieur 
  */
 void choleskySymbolique(const MatriceCSC *A, MatriceCSC *L)
 {
+    /* Initialisation de la matrice de sortie L*/
     L->n = 0;
     L->nnz = 0;
     L->valeurs = NULL;
@@ -32,6 +31,7 @@ void choleskySymbolique(const MatriceCSC *A, MatriceCSC *L)
     const int M = A->n;
     if (M <= 0) return;
 
+    /* Chaque noeud possède une liste de voisins non encore*/
     int **liste = calloc((size_t)M, sizeof(int *));
     size_t *taille = calloc((size_t)M, sizeof(size_t));
     if (liste == NULL || taille == NULL) {
@@ -39,15 +39,16 @@ void choleskySymbolique(const MatriceCSC *A, MatriceCSC *L)
         return;
     }
 
-    /* 1. Graphe initial : on ne garde que les voisins d'indice superieur. */
+    /* On construit le graphe initial à partir de A */
     for (int j = 0; j < M; j++) {
         size_t deb = A->debutColonne[j], fin = A->debutColonne[j + 1];
-        size_t s = 0;
+        size_t s = 0; /* Nombre de voisins*/
         for (size_t p = deb; p < fin; p++)
-            if (A->lignes[p] > j) s++;
+            if (A->lignes[p] > j) s++; /* Eléments hors diagonale ont un indice supérieur à j*/
         if (s > 0) {
             liste[j] = malloc(s * sizeof(int));
             if (liste[j] == NULL) { libererListes(liste, taille, M); return; }
+            /*On remplit la liste avec les voisins de j*/
             size_t k = 0;
             for (size_t p = deb; p < fin; p++)
                 if (A->lignes[p] > j) liste[j][k++] = A->lignes[p];
@@ -61,12 +62,12 @@ void choleskySymbolique(const MatriceCSC *A, MatriceCSC *L)
        les autres liaisons seront propagees quand le parent sera elimine a son tour. */
     for (int j = 0; j < M; j++) {
         size_t s = taille[j];
-        if (s < 2) continue;
+        if (s < 2) continue; /*impossible de créer une nouvelle connexion avec moins de 2 voisins */
 
-        int parent = liste[j][0];
+        int parent = liste[j][0]; /* premier voisin de la liste*/
         const int *S = liste[j] + 1;
-        size_t reste = s - 1;
-        size_t tp = taille[parent];
+        size_t reste = s - 1; /* nombre de voisins restants*/
+        size_t tp = taille[parent]; /* taille de la liste actuelle du parent*/
 
         int *fusion = malloc((tp + reste) * sizeof(int));
         if (fusion == NULL) { libererListes(liste, taille, M); return; }
@@ -86,12 +87,12 @@ void choleskySymbolique(const MatriceCSC *A, MatriceCSC *L)
         taille[parent] = k;
     }
 
-    /* 3. Passage au CSC : debutColonne[j+1] = debutColonne[j] + 1 + |S_j|. */
+    /* On stocke ces positions en format CSC : debutColonne[j+1] = debutColonne[j] + 1 + |S_j|. */
     size_t *deb = malloc(((size_t)M + 1) * sizeof(size_t));
     if (deb == NULL) { libererListes(liste, taille, M); return; }
     deb[0] = 0;
     for (int j = 0; j < M; j++)
-        deb[j + 1] = deb[j] + 1 + taille[j];
+        deb[j + 1] = deb[j] + 1 + taille[j]; /*Chaque colonne de L possède un élément diagonal et taille[j] éléments hors diagonale*/
     const size_t nnz = deb[M];
 
     int *lignes = malloc(nnz * sizeof(int));
@@ -104,9 +105,9 @@ void choleskySymbolique(const MatriceCSC *A, MatriceCSC *L)
 
     for (int j = 0; j < M; j++) {
         size_t k = deb[j];
-        lignes[k++] = j;                         /* diagonale en premier */
+        lignes[k++] = j;                         /* on remplit la diagonale en premier */
         for (size_t t = 0; t < taille[j]; t++)
-            lignes[k++] = liste[j][t];
+            lignes[k++] = liste[j][t]; /* puis les éléments hors diagonale*/
     }
 
     libererListes(liste, taille, M);
@@ -121,22 +122,7 @@ void choleskySymbolique(const MatriceCSC *A, MatriceCSC *L)
 
 /*
  * Cholesky "left-looking" creux, colonne par colonne.
- *
- * Colonne j :
- *   1. on depose la colonne j de A dans un vecteur de travail dense w (taille M) ;
- *   2. pour chaque colonne k < j qui contient une ligne j (l_jk != 0), on retire
- *      l_jk * (colonne k a partir de la ligne j) de w ;
- *   3. l_jj = sqrt(w[j]), puis l_ij = w[i] / l_jj pour les lignes i de la colonne j de L ;
- *   4. on remet w a zero sur la structure de la colonne j.
- *
- * Pour trouver les colonnes k de l'etape 2 sans parcourir les lignes de L (stockee par colonnes),
- * on utilise des listes chainees : tete[j] = premiere colonne k dont la prochaine ligne
- * a traiter est j, suivant[k] = colonne suivante dans la meme liste, pos[k] = position
- * courante dans la colonne k. Chaque coefficient de L est ainsi visite un nombre de fois
- * proportionnel a la taille de sa colonne, sans jamais construire L^T ni de matrice dense.
- *
- * Cela suppose que la structure de L est celle de l'analyse symbolique : pour une colonne k,
- * toutes les lignes i > j de la colonne k sont aussi dans la colonne j (propriete du remplissage).
+ * Depuis les positions trouvées par la version symbolique on va calculer les coefficients.
  */
 int choleskyNumerique(const MatriceCSC *A, MatriceCSC *L)
 {
@@ -145,26 +131,28 @@ int choleskyNumerique(const MatriceCSC *A, MatriceCSC *L)
     if (M <= 0 || L->n != M || L->valeurs == NULL ||
         L->lignes == NULL || L->debutColonne == NULL) return -1;
 
-    double *w      = calloc((size_t)M, sizeof(double));
-    int    *tete   = malloc((size_t)M * sizeof(int));
-    int    *suivant = malloc((size_t)M * sizeof(int));
-    size_t *pos    = malloc((size_t)M * sizeof(size_t));
+    double *w      = calloc((size_t)M, sizeof(double)); /*contient les coeff mis à jour pour la colonne en cours*/
+    int    *tete   = malloc((size_t)M * sizeof(int)); /*1ère colonne de L à traiter pour une ligne donnée*/
+    int    *suivant = malloc((size_t)M * sizeof(int)); 
+    size_t *pos    = malloc((size_t)M * sizeof(size_t));/*Pour la colonne active, donne la position du prochain coeff à traiter*/
     if (w == NULL || tete == NULL || suivant == NULL || pos == NULL) {
         free(w); free(tete); free(suivant); free(pos);
         return -1;
     }
+    /*On travaille avec des listes chaînées*/
     for (int i = 0; i < M; i++) tete[i] = -1;
 
     int code = 0;
+    /*On parcourt la colonne j*/
     for (int j = 0; j < M; j++) {
         const size_t deb = L->debutColonne[j];
         const size_t fin = L->debutColonne[j + 1];
 
-        /* 1. Colonne j de A (triangle inferieur : lignes >= j). */
+        /* On copie la colonne j de A dans w */
         for (size_t p = A->debutColonne[j]; p < A->debutColonne[j + 1]; p++)
             w[A->lignes[p]] = A->valeurs[p];
 
-        /* 2. Contributions des colonnes k < j qui touchent la ligne j. */
+        /* Contributions des colonnes précédentes */
         int k = tete[j];
         while (k != -1) {
             const int suiv = suivant[k];
@@ -173,6 +161,7 @@ int choleskyNumerique(const MatriceCSC *A, MatriceCSC *L)
             const double ljk = L->valeurs[p];
 
             for (size_t q = p; q < finK; q++)
+            /*Pour chaque ligne i à partir de j, on effectue la mise à jour*/
                 w[L->lignes[q]] -= L->valeurs[q] * ljk;
 
             pos[k] = p + 1;
@@ -184,22 +173,22 @@ int choleskyNumerique(const MatriceCSC *A, MatriceCSC *L)
             k = suiv;
         }
 
-        /* 3. Pivot puis colonne j de L. */
+        /* Calculs le pivot diagonal. */
         const double d = w[j];
-        if (!(d > 0.0)) {                            /* vrai aussi pour NaN */
+        if (!(d > 0.0)) {                          
             code = j + 1;
             break;
         }
         const double ljj = sqrt(d);
         L->valeurs[deb] = ljj;
-        w[j] = 0.0;
-        for (size_t p = deb + 1; p < fin; p++) {
-            const int i = L->lignes[p];
+        w[j] = 0.0;/* Remise à zéro pour les calculs suivants*/
+        for (size_t p = deb + 1; p < fin; p++) { /*Calcul des éléments sous la diagonale*/
+            const int i = L->lignes[p]; 
             L->valeurs[p] = w[i] / ljj;
-            w[i] = 0.0;                              /* 4. remise a zero */
+            w[i] = 0.0;                              /* Remise à zéro pour les calculs suivants*/
         }
 
-        /* La colonne j devra servir pour sa premiere ligne sous la diagonale. */
+        /* La colonne j devra contribuer au calcul d'une ligne future (si elle possède >1 élément sous la diagonale) */
         if (fin - deb > 1) {
             pos[j] = deb + 1;
             const int r = L->lignes[deb + 1];

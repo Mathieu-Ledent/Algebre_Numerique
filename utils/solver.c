@@ -7,6 +7,7 @@
 #pragma GCC optimize("O3", "unroll-loops")
 #endif
 
+/* Ly = b*/
 void substitutionAvant(const MatriceCSC *L, const double b[], double y[])
 {
     const int M = L->n;
@@ -15,12 +16,13 @@ void substitutionAvant(const MatriceCSC *L, const double b[], double y[])
 
     for (int i = 0; i < M; i++) {
         const size_t deb = L->debutColonne[i], fin = L->debutColonne[i + 1];
-        y[i] /= L->valeurs[deb];                       /* diagonale en premier */
+        y[i] /= L->valeurs[deb];                       /* élément de la diagonale */
         for (size_t p = deb + 1; p < fin; p++)
             y[L->lignes[p]] -= L->valeurs[p] * y[i];   /* contribution aux lignes suivantes */
     }
 }
 
+/* L^T F = b*/
 void substitutionArriere(const MatriceCSC *L, const double y[], double F[])
 {
     const int M = L->n;
@@ -28,7 +30,7 @@ void substitutionArriere(const MatriceCSC *L, const double y[], double F[])
         const size_t deb = L->debutColonne[i], fin = L->debutColonne[i + 1];
         double s = y[i];
         for (size_t p = deb + 1; p < fin; p++)
-            s -= L->valeurs[p] * F[L->lignes[p]];      /* l_ji * F_j, avec j > i deja calcule */
+            s -= L->valeurs[p] * F[L->lignes[p]];     
         F[i] = s / L->valeurs[deb];
     }
 }
@@ -48,7 +50,7 @@ int resoudrePoisson(Grille *grille, const int numero[], const MatriceCSC *L)
         return -1;
     }
 
-    /* Indice du noeud (ix, iy) de la grille complete : iy * nx + ix. */
+    /*On parcourt les noeuds dans l'ordre géométrique pour récupérer la bonne valeur de F  */
     for (int iy = 0; iy < nyi; iy++)
         for (int ix = 0; ix < nxi; ix++)
             b[numero[iy * nxi + ix]] = -grille->g[(iy + 1) * nx + (ix + 1)];
@@ -56,7 +58,10 @@ int resoudrePoisson(Grille *grille, const int numero[], const MatriceCSC *L)
     substitutionAvant(L, b, y);
     substitutionArriere(L, y, F);
 
-    for (int k = 0; k < nx * ny; k++) grille->f[k] = 0.0;   /* Dirichlet : f = 0 au bord */
+    /* Replace la solution du systeme sur les noeuds intérieurs
+   de la grille. Les bords sont nuls (conditions de Dirichlet),
+   et numero assure la correspondance entre les deux indexations. */
+    for (int k = 0; k < nx * ny; k++) grille->f[k] = 0.0;   
     for (int iy = 0; iy < nyi; iy++)
         for (int ix = 0; ix < nxi; ix++)
             grille->f[(iy + 1) * nx + (ix + 1)] = F[numero[iy * nxi + ix]];

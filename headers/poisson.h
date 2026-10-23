@@ -7,9 +7,8 @@
 
 
 
-/* Construit A = -Delta_h (triangle inferieur, CSC) pour les noeuds interieurs.
-   numero[i] = numero, dans la matrice, du noeud interieur i (ordre ligne par ligne).
-   A est fournie vide par l'appelant ; ses tableaux sont alloues ici. */
+/* Construit la matrice de poisson A, stockée en CSC, avec la numerotation numero[]*/
+
 void construireMatricePoisson(const Grille *grille,
                               const int numero[],
                               MatriceCSC *A);
