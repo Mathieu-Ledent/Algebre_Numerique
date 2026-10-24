@@ -11,7 +11,7 @@
 #include "solver.h"
 #include "utils.h"
 
-static OptionsReconstruction options = { NUMEROTATION_LIGNE, 0, 0 };
+static OptionsReconstruction options = { NUMEROTATION_LIGNE, 1, 0 };
 static StatistiquesReconstruction stats;
 
 /* Numerotation + matrice + facteur pour la derniere grille : a grille et numerotation fixees,

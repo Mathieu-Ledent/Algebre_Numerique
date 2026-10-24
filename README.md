@@ -2,7 +2,6 @@
 
 **Année académique :** 2026-2027  
 **Cours :** LINMA1170 - Analyse numérique  
-**Lien Overleaf :** https://overleaf.info.ucl.ac.be/2827439654ncfbrjqmpywj#be3b48  
 
 Ce projet implémente une chaîne complète de reconstruction de surface (courbe 2D) à partir d'un nuage de points potentiellement bruité. La méthode repose sur la **reconstruction de Poisson**, combinée à un solveur de système linéaire utilisant une **factorisation de Cholesky creuse**.
 
@@ -36,11 +35,13 @@ make                 # FLANN détecté via pkg-config ; sinon recherche exhausti
 make FLANN=0         # force la recherche exhaustive (référence de validation, aucune dépendance)
 make METIS=1         # active la numérotation METIS_NodeND (option -num metis)
 make test            # compile et lance tous les tests (build/test_*)
-make clean
+make experiences     # compile puis lance toutes les expériences et leurs graphes
+make clean           
 ```
 
 Installation des bibliothèques (Ubuntu/Debian) : `sudo apt install libflann-dev libmetis-dev`.
-Visualisation : `pip install numpy matplotlib`.
+Visualisation et expériences : `python3 -m pip install numpy matplotlib`.
+
 
 ### Organisation du code
 
@@ -82,7 +83,7 @@ python3 scripts/visualiser.py reconstruction.dat --reference cercle 0 0 1 --zoom
 * `-k` *(Optionnel, défaut = 5)* : Nombre de voisins à utiliser pour l'estimation locale.
 * `-sigma` *(Optionnel, défaut = 1.5 * pas de grille)* : Largeur de la gaussienne pour l'étalement.
 * `-num ligne|rcmk|nd|metis` *(Optionnel, défaut = ligne)* : Numérotation des nœuds intérieurs.
-* `-poids` *(Optionnel)* : poids a_i proportionnels à l'espacement local (échantillonnage non uniforme).
+* `-poids-unitaires` *(Optionnel)* : fixe tous les poids $a_i$ à 1 ; par défaut, ils sont adaptés à l'espacement local
 * `-inverser tout|x` *(Optionnel)* : inverse toutes les normales ou seulement leur composante x (étude 6.2).
 * `-o fichier` *(Optionnel, défaut = reconstruction.dat)* : fichier de sortie.
 * `-v` *(Optionnel)* : affiche les temps de chaque étape, nnz(A), nnz(L), le résidu et la dispersion autour de τ.
@@ -105,4 +106,3 @@ séparés par des lignes de commentaire `#`. `scripts/visualiser.py` lit ce form
 * **[Ledent /Mathieu]** - *[Orientation et parcours BFS + Schema de poisson]*
 * **[Vos de Wael / Thibault]** - *[Recherche spatiale et estimation des normales]*
 * **[Herygers / Maximilien]** - *[Étalement gaussien et expériences]*
-

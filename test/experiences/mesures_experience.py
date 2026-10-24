@@ -19,7 +19,7 @@ def extraire_residu(texte):
     return float(resultat.group(1)) if resultat else np.nan
 
 
-def ajouter_mesures(donnees, fichier_csv, cas, sigma, k, poids=False,
+def ajouter_mesures(donnees, fichier_csv, cas, sigma, k, poids=True,
                     cercle=False, residu=np.nan):
     points, nx, ny, xmin, ymin, h, tau, f = lire(donnees)
     x = xmin + h * np.arange(nx)

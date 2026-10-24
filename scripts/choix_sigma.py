@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 def creer_carre(n=40):
 
     t = np.linspace(-0.5, 0.5, n, endpoint=False)
