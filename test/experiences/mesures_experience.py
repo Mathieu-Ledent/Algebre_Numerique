@@ -1,6 +1,7 @@
 """Mesures simples pour les scripts d'experience"""
 import csv
 from pathlib import Path
+import re
 import sys
 
 import matplotlib
@@ -13,7 +14,13 @@ sys.path.insert(0, str(racine / "scripts"))
 from visualiser import bilineaire, distances_points_segments, lire
 
 
-def ajouter_mesures(donnees, fichier_csv, cas, sigma, k, poids=False, cercle=False):
+def extraire_residu(texte):
+    resultat = re.search(r"Residu relatif .* = ([0-9.eE+-]+)", texte)
+    return float(resultat.group(1)) if resultat else np.nan
+
+
+def ajouter_mesures(donnees, fichier_csv, cas, sigma, k, poids=False,
+                    cercle=False, residu=np.nan):
     points, nx, ny, xmin, ymin, h, tau, f = lire(donnees)
     x = xmin + h * np.arange(nx)
     y = ymin + h * np.arange(ny)
@@ -29,11 +36,14 @@ def ajouter_mesures(donnees, fichier_csv, cas, sigma, k, poids=False, cercle=Fal
     for s in segments:
         aire += 0.5 * abs(np.sum(s[:, 0] * np.roll(s[:, 1], -1)
                                 - s[:, 1] * np.roll(s[:, 0], -1)))
-    erreur_points = distances_points_segments(points, segments)
-    sommets = np.vstack(segments)
-    erreur_sommets = []
-    for sommet in sommets:
-        erreur_sommets.append(np.sqrt(((points - sommet) ** 2).sum(axis=1)).min())
+    if segments:
+        erreur_points = distances_points_segments(points, segments)
+        sommets = np.vstack(segments)
+        erreur_sommets = [np.sqrt(((points - sommet) ** 2).sum(axis=1)).min()
+                           for sommet in sommets]
+    else:
+        erreur_points = np.array([np.inf])
+        erreur_sommets = [np.inf]
 
     voisins = []
     for i, point in enumerate(points):
@@ -61,7 +71,7 @@ def ajouter_mesures(donnees, fichier_csv, cas, sigma, k, poids=False, cercle=Fal
         "erreur_moy_nuage_contour", "erreur_max_contour_nuage",
         "erreur_moy_contour_nuage",
         "erreur_max_reconstruction", "erreur_moy_reconstruction",
-        "erreur_max_reference", "erreur_moy_reference",
+        "erreur_max_reference", "erreur_moy_reference", "residu_relatif",
     ]
     ligne = [
         cas, len(points), nx, h, k, sigma, sigma / h, moyen, median,
@@ -69,7 +79,7 @@ def ajouter_mesures(donnees, fichier_csv, cas, sigma, k, poids=False, cercle=Fal
         sum(np.allclose(s[0], s[-1]) for s in segments),
         longueur, aire, float(erreur_points.max()), float(erreur_points.mean()),
         float(np.max(erreur_sommets)), float(np.mean(erreur_sommets)),
-        emax1, emoy1, emax2, emoy2,
+        emax1, emoy1, emax2, emoy2, residu,
     ]
 
     fichier_csv = Path(fichier_csv)
