@@ -104,5 +104,5 @@ séparés par des lignes de commentaire `#`. `scripts/visualiser.py` lit ce form
 * **[Asscherickx / Diego]** - *[Résoluton par Cholesky creux et visualisation]*
 * **[Ledent /Mathieu]** - *[Orientation et parcours BFS + Schema de poisson]*
 * **[Vos de Wael / Thibault]** - *[Recherche spatiale et estimation des normales]*
-* **[Nom / Prénom Étudiant 4]** - *[Étalement gaussien et expériences]*
+* **[Herygers / Maximilien]** - *[Étalement gaussien et expériences]*
 
