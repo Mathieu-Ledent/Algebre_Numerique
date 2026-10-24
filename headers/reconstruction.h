@@ -5,7 +5,7 @@
 #include "grille.h"
 #include "numerotation.h"
 
-/* Options facultatives, a regler avant l'appel (valeurs par defaut : ligne par ligne, a_i = 1). */
+/* Options facultatives, a regler avant l'appel (valeurs par defaut : ligne par ligne, poids adaptes). */
 typedef struct {
     MethodeNumerotation numerotation;
     int poidsAdaptes;          /* 0 : a_i = 1 ; 1 : poids selon l'espacement local */

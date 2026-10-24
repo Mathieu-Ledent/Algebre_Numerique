@@ -1,6 +1,6 @@
 /* Programme principal (section 7.1 de l'enonce), avec quelques options supplementaires :
      -num ligne|rcmk|nd|metis   numerotation des noeuds (defaut : ligne)
-     -poids                     poids a_i adaptes a l'espacement local (defaut : a_i = 1)
+     -poids-unitaires           fixe tous les poids a_i a 1 (defaut : poids adaptes)
      -inverser tout|x           inverse toutes les normales ou seulement leur composante x
      -o fichier                 fichier de sortie (defaut : reconstruction.dat)
      -v                         affiche les temps, le remplissage et le residu */
@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     double sigma = 0.0; /* Zero indique la valeur par defaut. */
     const char *fichier = NULL;
     const char *sortieDat = "reconstruction.dat";
-    OptionsReconstruction opt = { NUMEROTATION_LIGNE, 0, 0 };
+    OptionsReconstruction opt = { NUMEROTATION_LIGNE, 1, 0 };
     int N; /* Nombre de points lu dans le fichier. */
     for (int a = 1; a < argc; ++a) {
         const char *option = argv[a];
@@ -53,8 +53,8 @@ int main(int argc, char *argv[])
         } else if (strcmp(option, "-o") == 0) {
             if (++a == argc) goto usage;
             sortieDat = argv[a];
-        } else if (strcmp(option, "-poids") == 0) {
-            opt.poidsAdaptes = 1;
+        } else if (strcmp(option, "-poids-unitaires") == 0) {
+            opt.poidsAdaptes = 0;
         } else if (strcmp(option, "-v") == 0) {
             verbeux = 1;
         } else {
@@ -169,6 +169,6 @@ fin:
 usage:
     fprintf(stderr, "Usage : %s nuage.txt -N taille "
                     "[-sigma longueur] [-k voisins] [-num ligne|rcmk|nd|metis] "
-                    "[-poids] [-inverser tout|x] [-o sortie.dat] [-v]\n", argv[0]);
+                    "[-poids-unitaires] [-inverser tout|x] [-o sortie.dat] [-v]\n", argv[0]);
     return EXIT_FAILURE;
 }
